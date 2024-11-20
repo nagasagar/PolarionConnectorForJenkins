@@ -15,7 +15,7 @@ import java.io.IOException;
 import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 import org.apache.commons.lang.StringUtils;
-import org.json.JSONException;
+import net.sf.json.JSONException;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 

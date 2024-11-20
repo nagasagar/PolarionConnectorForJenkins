@@ -4,14 +4,14 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>4.82</version>
+    <version>4.85</version>
     <relativePath />
   </parent>
   <groupId>io.jenkins.plugins</groupId>
-  <artifactId>PolarionPlugin</artifactId>
+  <artifactId>polarion</artifactId>
   <version>${revision}</version>
   <packaging>hpi</packaging>
-  <name>Polarion Plugin</name>
+  <name>Polarion</name>
   <licenses>
     <license>
       <name>MIT License</name>
@@ -20,30 +20,38 @@
   </licenses>
   <properties>
     <revision>1.0</revision>
-    <jenkins.version>2.452</jenkins.version>
+    <jenkins.version>2.452.4</jenkins.version>
     <spotless.check.skip>true</spotless.check.skip>
   </properties>
 
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.387.x</artifactId>
-        <version>2423.vce598171d115</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
+        <dependency>
+            <groupId>io.jenkins.tools.bom</groupId>
+            <artifactId>bom-2.452.x</artifactId>
+            <!-- Latest version goes here -->
+            <version>3696.vb_b_4e2d1a_0542</version>
+            <scope>import</scope>
+            <type>pom</type>
+        </dependency>
     </dependencies>
-  </dependencyManagement>
+</dependencyManagement>
 
   <dependencies>
     <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
-      <version>20231013</version>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>json-api</artifactId>
     </dependency>
   </dependencies>
 
+  <developers>
+    <developer>
+      <id>nagasagar</id>
+      <name>Nagasagar Dasa</name>
+      <email>nagasagar@gmail.com</email>
+    </developer>
+  </developers>
+  
   <repositories>
     <repository>
       <id>repo.jenkins-ci.org</id>

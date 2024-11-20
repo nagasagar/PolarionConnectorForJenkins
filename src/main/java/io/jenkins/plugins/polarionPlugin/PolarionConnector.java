@@ -16,9 +16,9 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONException;
+import net.sf.json.JSONObject;
 
 public class PolarionConnector {
 
@@ -110,9 +110,9 @@ public class PolarionConnector {
             throw new HttpException(response, time, response.body().toString());
         }
 
-        JSONObject obj = new JSONObject(response.body().toString());
+        JSONObject obj = JSONObject.fromObject(response.body().toString());
         JSONArray projectNodes = obj.getJSONArray("data");
-        for (int i = 0; i < projectNodes.length(); i++) {
+        for (int i = 0; i < projectNodes.size(); i++) {
             String name = projectNodes.getJSONObject(i).getString("id");
             String idStr = projectNodes.getJSONObject(i).getString("id");
 
@@ -157,7 +157,7 @@ public class PolarionConnector {
             throw new HttpException(response, time, response.body().toString());
         }
 
-        JSONObject obj = new JSONObject(response.body().toString());
+        JSONObject obj = JSONObject.fromObject(response.body().toString());
         JSONObject data = obj.getJSONObject("data");
         return data.getString("id");
     }
@@ -186,7 +186,7 @@ public class PolarionConnector {
             throw new HttpException(response, time, response.body().toString());
         }
 
-        JSONObject obj = new JSONObject(response.body().toString());
+        JSONObject obj = JSONObject.fromObject(response.body().toString());
         JSONObject data = obj.getJSONArray("data").getJSONObject(0);
         return data.getString("id");
     }

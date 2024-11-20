@@ -24,7 +24,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.types.FileSet;
-import org.json.JSONException;
+import net.sf.json.JSONException;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -102,7 +102,7 @@ public class PolarionNotifier extends Notifier {
             final long timeOnMaster = System.currentTimeMillis();
 
             listener.getLogger().println("Starting test results  upload to Polarion project - " + this.project);
-            String restToken = this.getDescriptor().getToken().getPlainText();
+            Secret restToken = this.getDescriptor().getToken();
             String mixedID = workspace.act(new ParseResultCallable(
                     listener,
                     expandTestResults,
@@ -140,7 +140,7 @@ public class PolarionNotifier extends Notifier {
         private BuildListener listener;
         private final String testResults;
         private final String url;
-        private final String token;
+        private final Secret token;
         private final String project;
         private String testRunIdPrefix;
         private String testRunTitle;
@@ -151,7 +151,7 @@ public class PolarionNotifier extends Notifier {
                 BuildListener listener,
                 String testResults,
                 String url,
-                String token,
+                Secret token,
                 String project,
                 String testRunIdPrefix,
                 String testRunTitle,
@@ -183,7 +183,7 @@ public class PolarionNotifier extends Notifier {
                     File reportFile = new File(baseDir, value);
                     listFiles.add(reportFile);
                 }
-                PolarionConnector polarionConnector = new PolarionConnector(url, token);
+                PolarionConnector polarionConnector = new PolarionConnector(url, token.getPlainText());
                 String testRunId = polarionConnector.createNewTestRun(
                         this.project, this.testRunIdPrefix, this.testRunTitle, this.testRunType, this.groupId);
                 listener.getLogger()
@@ -224,6 +224,7 @@ public class PolarionNotifier extends Notifier {
             return true;
         }
 
+        @SuppressWarnings("lgtm[jenkins/no-permission-check]")
         public FormValidation doTestConnection(
                 @QueryParameter("url") String url, @QueryParameter("token") String token) {
             try {
@@ -251,6 +252,7 @@ public class PolarionNotifier extends Notifier {
             return token;
         }
 
+        @SuppressWarnings("lgtm[jenkins/no-permission-check]")
         public FormValidation doCheckProject(@QueryParameter("project") String project)
                 throws IOException, InterruptedException {
             String restToken = token.getPlainText();
@@ -274,7 +276,7 @@ public class PolarionNotifier extends Notifier {
          * @return the validation result.
          * @throws IOException if an error occurs.
          */
-        @SuppressWarnings("rawtypes")
+        @SuppressWarnings({"rawtypes", "lgtm[jenkins/no-permission-check]"})
         public FormValidation doCheckTestResults(@AncestorInPath AbstractProject project, @QueryParameter String value)
                 throws IOException {
             if (project == null) {

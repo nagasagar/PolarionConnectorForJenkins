@@ -1,0 +1,58 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>pwid</name>
+          <description>id of wi tobe updated</description>
+          <trim>true</trim>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <io.jenkins.plugins.polarionPlugin.PolarionWorkItemStatusUpdateBuilder plugin="PolarionPlugin@1.0">
+      <projectId>JenkinsPlugin</projectId>
+      <workItemId>$pwid</workItemId>
+      <workflowAction>start_progress</workflowAction>
+    </io.jenkins.plugins.polarionPlugin.PolarionWorkItemStatusUpdateBuilder>
+    <hudson.tasks.Maven>
+      <targets>clean test</targets>
+      <usePrivateRepository>false</usePrivateRepository>
+      <settings class="jenkins.mvn.DefaultSettingsProvider"/>
+      <globalSettings class="jenkins.mvn.DefaultGlobalSettingsProvider"/>
+      <injectBuildVariables>false</injectBuildVariables>
+    </hudson.tasks.Maven>
+  </builders>
+  <publishers>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>target/surefire-reports/*.xml</artifacts>
+      <allowEmptyArchive>false</allowEmptyArchive>
+      <onlyIfSuccessful>false</onlyIfSuccessful>
+      <fingerprint>false</fingerprint>
+      <defaultExcludes>true</defaultExcludes>
+      <caseSensitive>true</caseSensitive>
+      <followSymlinks>false</followSymlinks>
+    </hudson.tasks.ArtifactArchiver>
+    <io.jenkins.plugins.polarionPlugin.PolarionNotifier plugin="PolarionPlugin@1.0">
+      <project>JenkinsPlugin</project>
+      <testRunIdPrefix>JenkinsPlugin0524</testRunIdPrefix>
+      <testRunTitle>Test Run Created By Jenkins </testRunTitle>
+      <testRunType>imported</testRunType>
+      <groupId>Innovations.05.24</groupId>
+      <testResultsXml>target/surefire-reports/*.xml</testResultsXml>
+    </io.jenkins.plugins.polarionPlugin.PolarionNotifier>
+  </publishers>
+  <buildWrappers/>
+</project>

@@ -1,0 +1,36 @@
+timestamps {
+    properties(
+        [
+            parameters([
+                string(defaultValue: 'EL-404', name: 'polarionWorkItemId')
+        ])   
+        ]
+    ) 
+
+node () {
+
+	stage ('Sample-Maven-Project - Build') {
+		polarionWorkItemStatusUpdater projectId: "elibrary",workItemId: params.polarionWorkItemId, workflowAction: "start_progress"
+		catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+			// Maven build step
+			withMaven(maven: 'maven3.6.3') { 
+				if(isUnix()) {
+					sh "mvn clean test " 
+				} else { 
+					bat "mvn clean test " 
+				} 
+			}
+		}	 
+	}
+	stage ('Sample-Maven-Project - archive') {
+		catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+			archiveArtifacts allowEmptyArchive: false, artifacts: 'target/surefire-reports/*.xml', caseSensitive: true, defaultExcludes: true, fingerprint: false, onlyIfSuccessful: false
+		}
+	}
+	stage ('Sample-Maven-Project - publish') {
+		catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            polarionTestResultNotifier project: "elibrary", testRunIdPrefix:"Innov", testRunTitle:"tests executed on jenkins", testRunType:"automated", groupId:"Innovations.05.24", testResultsXml:"target/surefire-reports/*.xml"
+		}
+	}
+}
+}

@@ -20,18 +20,21 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import jenkins.MasterToSlaveFileCallable;
+import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.types.FileSet;
+import org.jenkinsci.Symbol;
+
 import net.sf.json.JSONException;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
-public class PolarionNotifier extends Notifier {
-    public static final String PLUGIN_SHORTNAME = "polarion-testResultReporter";
+public class PolarionNotifier extends Notifier implements SimpleBuildStep {
+    public static final String PLUGIN_SHORTNAME = "polarion-plugin";
 
     private String project;
     private String testRunIdPrefix;
@@ -197,6 +200,7 @@ public class PolarionNotifier extends Notifier {
     }
 
     @Extension
+    @Symbol("polarionTestResultNotifier")
     public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
         public static final String NO_CONNECTION =
                 "Please fill in connection details in Manage Jenkins -> Configure System";

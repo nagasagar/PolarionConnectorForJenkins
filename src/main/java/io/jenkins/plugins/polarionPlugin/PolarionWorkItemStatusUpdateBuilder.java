@@ -15,6 +15,8 @@ import java.io.IOException;
 import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.Symbol;
+
 import net.sf.json.JSONException;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -71,6 +73,7 @@ public class PolarionWorkItemStatusUpdateBuilder extends Builder implements Simp
     }
 
     @Extension
+    @Symbol("polarionWorkItemStatusUpdater")
     public static final class BuilderDescriptor extends BuildStepDescriptor<Builder> {
         public static final String NO_CONNECTION =
                 "Please fill in connection details in Manage Jenkins -> Configure System";

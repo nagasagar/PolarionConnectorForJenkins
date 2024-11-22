@@ -10,3 +10,6 @@ After this step 4 folder should have src(folder) and pom.xml (file)
 5. restart Jenkins
 
 6. edit the configuration of job with actual values for project, xml file location, etc
+
+
+For Scrpted pipeline example refer samplePipelineScript.txt

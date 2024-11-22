@@ -1,6 +1,7 @@
 package io.jenkins.plugins.polarionPlugin;
 
 import hudson.AbortException;
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -8,6 +9,8 @@ import hudson.Util;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.remoting.VirtualChannel;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
@@ -15,6 +18,8 @@ import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
+import io.jenkins.plugins.polarionPlugin.PolarionNotifier.DescriptorImpl;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -92,7 +97,41 @@ public class PolarionNotifier extends Notifier implements SimpleBuildStep {
     public DescriptorImpl getDescriptor() {
         return (DescriptorImpl) super.getDescriptor();
     }
-
+    
+   @Override
+    public void perform(Run<?, ?> run, FilePath workspace, EnvVars env, Launcher launcher, TaskListener listener)
+            throws InterruptedException, IOException {
+    	if (workspace == null) {
+            throw new AbortException("no workspace found ");
+        }
+    	
+    	final long timeOnMaster = System.currentTimeMillis();
+    	 listener.getLogger().println("Starting test results  upload to Polarion project - " + this.project);
+    	String expandTestResults = testResultsXml;
+    	Secret restToken = this.getDescriptor().getToken();
+    	String mixedID = workspace.act(new ParseResultCallable(
+    			listener,
+                 expandTestResults,
+                 this.getDescriptor().getUrl(),
+                 restToken,
+                 project,
+                 testRunIdPrefix,
+                 testRunTitle,
+                 testRunType,
+                 groupId));
+    	long time = System.currentTimeMillis() - timeOnMaster;
+        String fullTestRunID = mixedID.split("###")[0];
+        String JobID = mixedID.split("###")[1];
+        String testRunID = fullTestRunID.replace(this.project + "/", "");
+        String jobSubmitted =
+                String.format("TestResults Upload job subimtted with JobID %s. Took %sms", JobID, time);
+        listener.getLogger().println(jobSubmitted);
+        run.setDescription(jobSubmitted + "\n\n" + "Job log - "
+                + this.getDescriptor().getUrl() + "/job-report?jobId=" + JobID + "\n\n" + "TestRun link - "
+                + this.getDescriptor().getUrl() + "/redirect/project/" + this.project + "/testrun?id=" + testRunID);
+        run.save();
+    }
+    
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
             throws IOException, AbortException {
@@ -107,7 +146,7 @@ public class PolarionNotifier extends Notifier implements SimpleBuildStep {
             listener.getLogger().println("Starting test results  upload to Polarion project - " + this.project);
             Secret restToken = this.getDescriptor().getToken();
             String mixedID = workspace.act(new ParseResultCallable(
-                    listener,
+            		listener,
                     expandTestResults,
                     this.getDescriptor().getUrl(),
                     restToken,
@@ -140,7 +179,7 @@ public class PolarionNotifier extends Notifier implements SimpleBuildStep {
     private static final class ParseResultCallable extends MasterToSlaveFileCallable<String> {
 
         private static final long serialVersionUID = 1L;
-        private BuildListener listener;
+        private TaskListener listener;
         private final String testResults;
         private final String url;
         private final Secret token;
@@ -151,7 +190,7 @@ public class PolarionNotifier extends Notifier implements SimpleBuildStep {
         private String groupId;
 
         private ParseResultCallable(
-                BuildListener listener,
+        		TaskListener listener,
                 String testResults,
                 String url,
                 Secret token,
@@ -160,7 +199,7 @@ public class PolarionNotifier extends Notifier implements SimpleBuildStep {
                 String testRunTitle,
                 String testRunType,
                 String groupId) {
-            this.listener = listener;
+        	this.listener = listener;
             this.testResults = testResults;
             this.url = url;
             this.token = token;

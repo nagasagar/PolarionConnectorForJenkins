@@ -34,7 +34,7 @@ import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 public class PolarionNotifier extends Notifier implements SimpleBuildStep {
-    public static final String PLUGIN_SHORTNAME = "polarion-plugin";
+    public static final String PLUGIN_SHORTNAME = "polarion-connector-plugin";
 
     private String project;
     private String testRunIdPrefix;

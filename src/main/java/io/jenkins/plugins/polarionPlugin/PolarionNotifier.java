@@ -9,6 +9,7 @@ import hudson.Util;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
+import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.remoting.VirtualChannel;
@@ -300,7 +301,7 @@ public class PolarionNotifier extends Notifier implements SimpleBuildStep {
         @POST
         public FormValidation doCheckProject(@QueryParameter("project") String project)
                 throws IOException, InterruptedException {
-        	Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+        	Jenkins.get().checkPermission(Item.CONFIGURE);
             String restToken = token.getPlainText();
             if (StringUtils.isBlank(url) || StringUtils.isBlank(restToken)) {
                 return FormValidation.error(NO_CONNECTION);
@@ -323,12 +324,14 @@ public class PolarionNotifier extends Notifier implements SimpleBuildStep {
          * @throws IOException if an error occurs.
          */
         @SuppressWarnings({"rawtypes"})
+        @POST
         public FormValidation doCheckTestResults(@AncestorInPath AbstractProject project, @QueryParameter String value)
                 throws IOException {
-        	Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             if (project == null) {
                 return FormValidation.ok();
             }
+            Jenkins.get().checkPermission(Item.CONFIGURE);
+            Jenkins.get().checkPermission(Item.WORKSPACE);
             return FilePath.validateFileMask(project.getSomeWorkspace(), value);
         }
     }

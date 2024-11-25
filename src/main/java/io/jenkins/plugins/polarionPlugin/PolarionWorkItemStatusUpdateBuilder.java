@@ -5,6 +5,7 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractProject;
+import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
@@ -84,7 +85,7 @@ public class PolarionWorkItemStatusUpdateBuilder extends Builder implements Simp
         public FormValidation doCheckWorkItem(
                 @QueryParameter("projectId") String projectId, @QueryParameter("workItemId") String workItemId)
                 throws IOException, InterruptedException {
-        	Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+        	Jenkins.get().checkPermission(Item.CONFIGURE);
         	DescriptorImpl globalConfig = getGlobalConfig();
             String url = globalConfig.getUrl();
             String token = globalConfig.getToken().getPlainText();

@@ -6,6 +6,7 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractProject;
 import hudson.model.Item;
+import hudson.model.Job;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
@@ -19,6 +20,8 @@ import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 
 import net.sf.json.JSONException;
+
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.verb.POST;
@@ -83,9 +86,9 @@ public class PolarionWorkItemStatusUpdateBuilder extends Builder implements Simp
         public static final String DISPLAY_NAME = "Polarion WorkItem Status Updater";
         @POST
         public FormValidation doCheckWorkItem(
-                @QueryParameter("projectId") String projectId, @QueryParameter("workItemId") String workItemId)
+                @QueryParameter("projectId") String projectId, @QueryParameter("workItemId") String workItemId, @AncestorInPath Job<?,?> job)
                 throws IOException, InterruptedException {
-        	Jenkins.get().checkPermission(Item.CONFIGURE);
+        	job.checkPermission(Item.CONFIGURE);
         	DescriptorImpl globalConfig = getGlobalConfig();
             String url = globalConfig.getUrl();
             String token = globalConfig.getToken().getPlainText();

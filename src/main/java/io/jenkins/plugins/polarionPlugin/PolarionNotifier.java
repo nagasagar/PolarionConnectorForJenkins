@@ -18,13 +18,13 @@ import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
-import io.jenkins.plugins.polarionPlugin.PolarionNotifier.DescriptorImpl;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import jenkins.MasterToSlaveFileCallable;
+import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -37,6 +37,7 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.verb.POST;
 
 public class PolarionNotifier extends Notifier implements SimpleBuildStep {
     public static final String PLUGIN_SHORTNAME = "polarion-connector-plugin";
@@ -267,10 +268,11 @@ public class PolarionNotifier extends Notifier implements SimpleBuildStep {
             return true;
         }
 
-        @SuppressWarnings("lgtm[jenkins/no-permission-check]")
+        @POST
         public FormValidation doTestConnection(
                 @QueryParameter("url") String url, @QueryParameter("token") String token) {
             try {
+            	Jenkins.get().checkPermission(Jenkins.ADMINISTER);
                 PolarionConnector polarionConnector = new PolarionConnector(url, token);
                 polarionConnector.connect();
                 return FormValidation.ok("Successful Connection");
@@ -295,9 +297,10 @@ public class PolarionNotifier extends Notifier implements SimpleBuildStep {
             return token;
         }
 
-        @SuppressWarnings("lgtm[jenkins/no-permission-check]")
+        @POST
         public FormValidation doCheckProject(@QueryParameter("project") String project)
                 throws IOException, InterruptedException {
+        	Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             String restToken = token.getPlainText();
             if (StringUtils.isBlank(url) || StringUtils.isBlank(restToken)) {
                 return FormValidation.error(NO_CONNECTION);
@@ -319,9 +322,10 @@ public class PolarionNotifier extends Notifier implements SimpleBuildStep {
          * @return the validation result.
          * @throws IOException if an error occurs.
          */
-        @SuppressWarnings({"rawtypes", "lgtm[jenkins/no-permission-check]"})
+        @SuppressWarnings({"rawtypes"})
         public FormValidation doCheckTestResults(@AncestorInPath AbstractProject project, @QueryParameter String value)
                 throws IOException {
+        	Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             if (project == null) {
                 return FormValidation.ok();
             }

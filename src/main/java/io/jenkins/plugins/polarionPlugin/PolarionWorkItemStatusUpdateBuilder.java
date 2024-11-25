@@ -20,6 +20,7 @@ import org.jenkinsci.Symbol;
 import net.sf.json.JSONException;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.verb.POST;
 
 public class PolarionWorkItemStatusUpdateBuilder extends Builder implements SimpleBuildStep {
 
@@ -79,10 +80,12 @@ public class PolarionWorkItemStatusUpdateBuilder extends Builder implements Simp
                 "Please fill in connection details in Manage Jenkins -> Configure System";
         
         public static final String DISPLAY_NAME = "Polarion WorkItem Status Updater";
+        @POST
         public FormValidation doCheckWorkItem(
                 @QueryParameter("projectId") String projectId, @QueryParameter("workItemId") String workItemId)
                 throws IOException, InterruptedException {
-            DescriptorImpl globalConfig = getGlobalConfig();
+        	Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+        	DescriptorImpl globalConfig = getGlobalConfig();
             String url = globalConfig.getUrl();
             String token = globalConfig.getToken().getPlainText();
             if (StringUtils.isBlank(url) || StringUtils.isBlank(token)) {
